@@ -1,10 +1,5 @@
 # sql-sql-practice
 -----Queries-----
-Easy level
-Medium level
-Difficult level
-------------------
-------------------
 ---------Easy level-------
 --------------------------
 1. Show first name, last name, and gender of patients whose gender is 'M'
