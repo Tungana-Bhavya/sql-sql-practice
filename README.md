@@ -198,6 +198,113 @@ collected from the website  https://www.sql-practice.com/ . Based on the complex
 
 -----
 
+31. Show patient_id, diagnosis from admissions. Find patients admitted multiple times for the same diagnosis.
+
+---SELECT PATIENT_ID, DIAGNOSIS FROM ADMISSIONS GROUP BY PATIENT_ID,DIAGNOSIS HAVING COUNT(PATIENT_ID)>1;
+
+-----
+
+32. We want to display each patient's full name in a single column. Their last_name in all upper letters must appear first, then first_name in 
+    all lower case letters. Separate the last_name and first_name with a comma. Order the list by the first_name in decending order
+
+---SELECT CONCAT(UPPER(LAST_NAME),',',LOWER(FIRST_NAME))AS NEW_NAME_FORMAT FROM PATIENTS ORDER BY FIRST_NAME DESC;
+
+-----
+
+33. Show the province_id(s), sum of height; where the total sum of its patient's height is greater than or equal to 7,000.
+
+---SELECT PROVINCE_ID, SUM(HEIGHT)AS SUM_HEIGHT FROM PATIENTS GROUP BY PROVINCE_ID HAVING SUM_HEIGHT>=7000;
+
+-----
+
+34. Show all columns for patient_id 542's most recent admission_date.
+
+---SELECT * FROM ADMISSIONS WHERE PATIENT_ID=542 GROUP BY PATIENT_ID HAVING MAX(ADMISSION_DATE);
+
+-----
+
+35. Show patient_id, first_name, last_name from patients whose does not have any records in the admissions table. (Their patient_id does not 
+    exist in any admissions.patient_id rows.)
+
+---SELECT PATIENTS.PATIENT_ID,FIRST_NAME,LAST_NAME from PATIENTS LEFT JOIN ADMISSIONS ON PATIENTS.PATIENT_ID=ADMISSIONS.PATIENT_ID WHERE 
+   ADMISSIONS.PATIENT_ID IS NULL;
+
+-----
+
+36. For each doctor, display their id, full name, and the first and last admission date they attended.
+
+---SELECT DOCTOR_ID,CONCAT(FIRST_NAME,' ',LAST_NAME),MIN(ADMISSION_DATE)AS LAST_DATE,MAX(ADMISSION_DATE)AS FIRST_DATE FROM ADMISSIONS JOIN 
+   DOCTORS ON ADMISSIONS.ATTENDING_DOCTOR_ID=DOCTORS.DOCTOR_ID GROUP BY DOCTOR_ID;
+
+-----
+
+37. For every admission, display the patient's full name, their admission diagnosis, and their doctor's full name who diagnosed their problem.
+
+---SELECT CONCAT(P.FIRST_NAME,' ',P.LAST_NAME)AS PATIENT_NAME,A.DIAGNOSIS,CONCAT(D.FIRST_NAME,' ',D.LAST_NAME)AS DOCTOR_NAME FROM PATIENTS P 
+   JOIN ADMISSIONS A JOIN DOCTORS D ON P.PATIENT_ID=A.PATIENT_ID ANDA.ATTENDING_DOCTOR_ID=D.DOCTOR_ID;
+
+-----
+
+38. Display the total amount of patients for each province. Order by descending.
+
+---SELECT PROVINCE_NAME,COUNT(*)AS PATIENT_COUNT FROM PROVINCE_NAMES JOIN PATIENTS ON PROVINCE_NAMES.PROVINCE_ID=PATIENTS.PROVINCE_ID 
+   GROUP BY PROVINCE_NAMES.PROVINCE_ID ORDER BY PATIENT_COUNT DESC;
+
+-----
+
+39. Show first_name, last_name, and the total number of admissions attended for each doctor.Every admission has been attended by a doctor
+
+---SELECT D.FIRST_NAME,D.LAST_NAME,COUNT(*) AS ADMISSIONS_TOTAL FROM DOCTORS D JOIN ADMISSIONS A ON D.DOCTOR_ID=A.ATTENDING_DOCTOR_ID GROUP BY 
+   ATTENDING_DOCTOR_ID;
+
+-----
+
+40. Show patient_id, attending_doctor_id, and diagnosis for admissions that match one of the two criteria:
+    1. patient_id is an odd number and attending_doctor_id is either 1, 5, or 19.
+    2. attending_doctor_id contains a 2 and the length of patient_id is 3 characters.
+
+---SELECT PATIENT_ID,ATTENDING_DOCTOR_ID,DIAGNOSIS FROM ADMISSIONS WHERE PATIENT_ID % 2=1 AND 
+ATTENDING_DOCTOR_ID IN (1,5,19) OR ATTENDING_DOCTOR_ID LIKE '%2%' AND LENGTH(PATIENT_ID)=3;
+
+-----
+
+41. Show all of the days of the month (1-31) and how many admission_dates occurred on that day. Sort by the day with most admissions to least 
+    admissions.
+
+---SELECT DAY(ADMISSION_DATE)AS DAY_NUMBER,COUNT(*) AS NUMBER_OF_ADMISSIONS FROM ADMISSIONS GROUP BY DAY_NUMBER ORDER BY 
+   NUMBER_OF_ADMISSIONS DESC;
+
+-----
+
+42. Display patient's full name, height in the units feet rounded to 1 decimal, weight in the unit pounds rounded to 0 decimals, birth_date,
+    gender non abbreviated.
+    Convert CM to feet by dividing by 30.48.
+    Convert KG to pounds by multiplying by 2.205.
+
+---SELECT CONCAT(FIRST_NAME,' ',LAST_NAME) AS 'PATIENT_NAME',ROUND(HEIGHT/30.48,1)AS 'HEIGHT "FEET"',ROUND(WEIGHT/2.205,0)AS 'WEIGHT 
+   "POUNDS"',BIRTH_DATE, CASE WHEN GENDER ='M' THEN 'MALE' ELSE 'FEMALE' END AS "GENDER" FROM PATIENTS;
+
+   -----
+
+   #### Difficult level(43-54)
+43. Show patient_id, first_name, last_name, and attending doctor's specialty.
+    Show only the patients who has a diagnosis as 'Epilepsy' and the doctor's first name is 'Lisa'
+    Check patients, admissions, and doctors tables for required information.
+
+---SELECT
+  P.PATIENT_ID,
+  P.FIRST_NAME AS PATIENT_FIRST_NAME,
+  P.LAST_NAME AS PATIENT_LAST_NAME,
+  D.SPECIALTY AS ATTENDING_DOCTOR_SPECIALTY
+  FROM PATIENTS P
+  JOIN ADMISSIONS A ON A.PATIENT_ID = P.PATIENT_ID
+  JOIN DOCTORS D ON D.DOCTOR_ID = A.ATTENDING_DOCTOR_ID
+  WHERE
+  D.FIRST_NAME = 'Lisa' and
+  A.DIAGNOSIS = 'Epilepsy';
+  
+  -----
+
 
 
 
