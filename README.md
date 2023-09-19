@@ -286,7 +286,8 @@ ATTENDING_DOCTOR_ID IN (1,5,19) OR ATTENDING_DOCTOR_ID LIKE '%2%' AND LENGTH(PAT
 
    -----
 
-   #### Difficult level(43-54)
+   #### Difficult level(43-53)
+   -----
 43. Show patient_id, first_name, last_name, and attending doctor's specialty.
     Show only the patients who has a diagnosis as 'Epilepsy' and the doctor's first name is 'Lisa'
     Check patients, admissions, and doctors tables for required information.
@@ -301,16 +302,95 @@ JOIN DOCTORS D ON D.DOCTOR_ID = A.ATTENDING_DOCTOR_ID WHERE D.FIRST_NAME = 'Lisa
  -----
 
 44. Show the provinces that has more patients identified as 'M' than 'F'. Must only show full province_name
+
 ---SELECT P1.PROVINCE_NAME FROM PROVINCE_NAMES P1 JOIN PATIENTS P ON P1.PROVINCE_ID=P.PROVINCE_ID
 GROUP BY PROVINCE_NAME HAVING COUNT( CASE WHEN GENDER = 'M' THEN 1 END) > COUNT( CASE WHEN GENDER = 'F' THEN 1 END);
   
 ----
 
 45. Sort the province names in ascending order in such a way that the province 'Ontario' is always on top.
+
 ---SELECT PROVINCE_NAME FROM PROVINCE_NAMES ORDER BY(case when province_name = 'Ontario' then 0 else 1 end),
    PROVINCE_NAME;
+
 -----
- 
+
+46. For each day display the total amount of admissions on that day. Display the amount changed from the previous date.
+
+---SELECT ADMISSION_DATE,COUNT(ADMISSION_DATE) AS ADMISSION_DAY,COUNT(ADMISSION_DATE) - LAG(COUNTt(ADMISSION_DATE)) OVER(ORDER BY 
+   ADMISSION_DATE) AS ADMISSION_COUNT_CHANGE FROM ADMISSIONS GROUP BY ADMISSION_DATE;
+
+-----
+
+47. We need a breakdown for the total amount of admissions each doctor has started each year. Show the doctor_id, doctor_full_name, specialty, 
+    year, total_admissions for that year.
+
+---SELECT D.DOCTOR_ID,CONCAT(D.FIRST_NAME,' ',D.LAST_NAME)AS DOCTOR_NAME,D.SPECIALTY,YEAR(A.ADMISSION_DATE) AS SELECTED_YEAR, COUNT(*) AS 
+   TOTAL_ADMISSIONS FROM DOCTORS D LEFT JOIN ADMISSIONS A ON D.DOCTOR_ID=A.ATTENDING_DOCTOR_ID GROUP BY DOCTOR_NAME,SELECTED_YEAR ORDER BY 
+   DOCTOR_ID,SELECTED_YEAR;
+
+-----
+
+48. We are looking for a specific patient. Pull all columns for the patient who matches the following criteria:
+- First_name contains an 'r' after the first two letters.
+- Identifies their gender as 'F'
+- Born in February, May, or December
+- Their weight would be between 60kg and 80kg
+- Their patient_id is an odd number
+- They are from the city 'Kingston'
+
+---SELECT * FROM PATIENTS WHERE FIRST_NAME LIKE '__R%' AND GENDER='F' AND MONTH(BIRTH_DATE) IN (2,5,12) AND WEIGHT BETWEEN 60 AND 80 
+   AND PATIENT_ID % 2 = 1 AND CITY='Kingston';
+
+-----
+
+49. Show the percent of patients that have 'M' as their gender. Round the answer to the nearest hundreth number and in percent form.
+
+---SELECT CONCAT(ROUND(SUM(GENDERr='M') / CAST(COUNT(*) AS FLOAT), 4) * 100, '%')FROM PATIENTS;
+
+-----
+
+50. All patients who have gone through admissions, can see their medical documents on our site. Those patients are given a temporary password 
+    after their first admission. Show the patient_id and temp_password.
+    The password must be the following, in order:
+    1. patient_id
+    2. the numerical length of patient's last_name
+    3. year of patient's birth_date
+
+---SELECT DISTINCT P.PATIENT_ID,CONCAT(P.PATIENT_ID,LEN(LAST_NAME), YEAR(BIRTH_DATE)) AS TEMP_PASSWORD FROM PATIENTS P JOIN ADMISSIONS A ON 
+   A.PATIENT_ID = P.PATIENT_ID;
+
+-----
+
+51. Each admission costs $50 for patients without insurance, and $10 for patients with insurance. All patients with an even patient_id have 
+    insurance.Give each patient a 'Yes' if they have insurance, and a 'No' if they don't have insurance. Add up the admission_total cost for 
+    each has_insurance group.
+
+---SELECT HAS_INSURANCE,SUM(ADMISSION_COST) AS ADMISSION_TOTAL FROM
+   (SELECT PATIENT_ID,CASE WHEN PATIENT_ID % 2 = 0 THEN 'YES' ELSE 'NO' END AS HAS_INSURANCE,CASE WHEN PATIENT_ID % 2 = 0 THEN 10 ELSE 50 END AS 
+   ADMISSION_COST FROM ADMISSIONS)GROUP BY HAS_INSURANCE;
+
+-----
+
+52. Show all of the patients grouped into weight groups. Show the total amount of patients in each weight group. Order the list by the weight 
+    group decending.
+
+---SELECT COUNT(*) AS PATIENTS_IN_GROUP,FLOOR(WEIGHT / 10) * 10 AS WEIGHT_GROUP FROM PATIENTS
+   GROUP BY WEIGHT_GROUP ORDER BY WEIGHT_GROUP DESC;
+
+-----
+
+53. Show patient_id, weight, height, isObese from the patients table.
+    Display isObese as a boolean 0 or 1.
+    Obese is defined as weight(kg)/(height(m)2) >= 30.
+    weight is in units kg.
+    height is in units cm.
+
+--- SELECT PATIENT_ID, WEIGHT, HEIGHT,(CASE WHEN WEIGHT/(POWER(HEIGHT/100.0,2)) >= 30 THEN 1
+    ELSE 0 END) AS ISOBESE FROM PATIENTS;
+
+
+
 
 
 
