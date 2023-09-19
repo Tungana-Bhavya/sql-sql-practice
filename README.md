@@ -291,20 +291,26 @@ ATTENDING_DOCTOR_ID IN (1,5,19) OR ATTENDING_DOCTOR_ID LIKE '%2%' AND LENGTH(PAT
     Show only the patients who has a diagnosis as 'Epilepsy' and the doctor's first name is 'Lisa'
     Check patients, admissions, and doctors tables for required information.
 
----SELECT
-  P.PATIENT_ID,
-  P.FIRST_NAME AS PATIENT_FIRST_NAME,
-  P.LAST_NAME AS PATIENT_LAST_NAME,
-  D.SPECIALTY AS ATTENDING_DOCTOR_SPECIALTY
-  FROM PATIENTS P
-  JOIN ADMISSIONS A ON A.PATIENT_ID = P.PATIENT_ID
-  JOIN DOCTORS D ON D.DOCTOR_ID = A.ATTENDING_DOCTOR_ID
-  WHERE
-  D.FIRST_NAME = 'Lisa' and
-  A.DIAGNOSIS = 'Epilepsy';
-  
-  -----
+---SELECT P.PATIENT_ID, 
+P.FIRST_NAME AS PATIENT_FIRST_NAME,
+P.LAST_NAME AS PATIENT_LAST_NAME, 
+D.SPECIALTY AS ATTENDING_DOCTOR_SPECIALTY 
+FROM PATIENTS P JOIN ADMISSIONS A ON A.PATIENT_ID = P.PATIENT_ID 
+JOIN DOCTORS D ON D.DOCTOR_ID = A.ATTENDING_DOCTOR_ID WHERE D.FIRST_NAME = 'Lisa' and A.DIAGNOSIS = 'Epilepsy';
 
+ -----
+
+44. Show the provinces that has more patients identified as 'M' than 'F'. Must only show full province_name
+---SELECT P1.PROVINCE_NAME FROM PROVINCE_NAMES P1 JOIN PATIENTS P ON P1.PROVINCE_ID=P.PROVINCE_ID
+GROUP BY PROVINCE_NAME HAVING COUNT( CASE WHEN GENDER = 'M' THEN 1 END) > COUNT( CASE WHEN GENDER = 'F' THEN 1 END);
+  
+----
+
+45. Sort the province names in ascending order in such a way that the province 'Ontario' is always on top.
+---SELECT PROVINCE_NAME FROM PROVINCE_NAMES ORDER BY(case when province_name = 'Ontario' then 0 else 1 end),
+   PROVINCE_NAME;
+-----
+ 
 
 
 
